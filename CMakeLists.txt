@@ -1,8 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
 project(FaceDetectorCudaOpenCV LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+include_directories(include)
+
+add_executable(${PROJECT_NAME} src/main.cpp src/face_detector_cuda.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_WIN32_THREADS_INIT 0)
+set(CMAKE_USE_PTHREADS_INIT 1)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 # OpenCV setup
 find_package(OpenCV REQUIRED)
