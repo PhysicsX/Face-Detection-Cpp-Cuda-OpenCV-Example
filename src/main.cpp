@@ -2,7 +2,13 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/cudaobjdetect.hpp>
 #include <opencv2/cudaimgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui_c.h>
 
+#include "face_detector_cuda.hpp"
+#include <thread>
+#include <chrono>
 // g++ -I /usr/local/include/opencv4 example.cpp -o example `pkg-config opencv4 --cflags --libs`
 
 using namespace cv;
@@ -24,8 +30,8 @@ int main() {
     
 	// Options
     int WIDTH = 800;
-    int HEIGHT = 600;
-    int FPS = 60;
+    int HEIGHT = 480;
+    int FPS = 30;
 
     // Define the gstream pipeline
     std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
@@ -38,9 +44,14 @@ int main() {
         cerr << "Can not open video source";
         return -1;
     }
+    //cvNamedWindow("FaceDetection", WindowFlags::CV_WINDOW_NORMAL);
+    //cvSetWindowProperty("FaceDetection", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+
     std::vector<cv::Rect> h_found;
     cv::Ptr<cv::cuda::CascadeClassifier> cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
     cv::cuda::GpuMat d_frame, d_gray, d_found;
+
+    FaceDetector faceObj;
     while(1)
     {
 	Mat frame;
@@ -48,15 +59,24 @@ int main() {
             cerr << "Can not read frame from webcam";
             return -1;
         }
-        d_frame.upload(frame);
-        cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
-        cascade->detectMultiScale(d_gray, d_found);
-	cascade->convert(d_found, h_found);
-		for(int i = 0; i < h_found.size(); ++i)
-		{
+        //d_frame.upload(frame);
+        //cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
+        //cascade->detectMultiScale(d_gray, d_found);
+	//cascade->convert(d_found, h_found);
+	faceObj.setFrame(frame);
+
+	h_found = faceObj.getRect();
+	for(int i = 0; i < h_found.size(); ++i)
+	{
               rectangle(frame, h_found[i], Scalar(0,255,255), 5);
-		}
+	}
+
+
+	cvNamedWindow("Result", CV_WINDOW_NORMAL);
+	cvSetWindowProperty("Result", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+
         imshow("Result", frame);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if (waitKey(1) == 'q') {
             break;
         }
