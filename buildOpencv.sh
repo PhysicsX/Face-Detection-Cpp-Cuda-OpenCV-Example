@@ -100,6 +100,8 @@ sudo apt-get install -y \
     zlib1g-dev \
     pkg-config
 
+# Remove old opencv if it is exist
+sudo find / -name " *opencv* " -exec rm -i {} \;
 
 # Python 2.7
 sudo apt-get install -y python-dev  python-numpy  python-py  python-pytest
