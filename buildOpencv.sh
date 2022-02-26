@@ -5,6 +5,9 @@
 OPENCV_VERSION=4.4.0
 # Jetson Nano
 ARCH_BIN=5.3
+
+OUTPUT_FILE=output.txt
+
 INSTALL_DIR=/usr/local
 # Download the opencv_extras repository
 # If you are installing the opencv testdata, ie
@@ -72,8 +75,8 @@ if [ $DOWNLOAD_OPENCV_EXTRAS == "YES" ] ; then
 fi
 
 # Repository setup
-sudo apt-add-repository universe
-sudo apt-get update
+sudo apt-add-repository universe |& tee -a $OUTPUT_FILE
+sudo apt-get update |& tee -a $OUTPUT_FILE 
 
 # Download dependencies for the desired configuration
 cd $WHEREAMI
@@ -98,35 +101,38 @@ sudo apt-get install -y \
     libx264-dev \
     qt5-default \
     zlib1g-dev \
-    pkg-config
+    python-dev \
+    python-numpy \
+    python-py \
+    python-pytest \
+    python3-dev \
+    python3-numpy \
+    python3-py \
+    python3-pytest \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    pkg-config |& tee -a $OUTPUT_FILE 
 
 # Remove old opencv if it is exist
-find / -name " *opencv* " -exec rm -i {} \;
-find / -name " *opencv4* " -exec rm -i {} \;
-
-# Python 2.7
-sudo apt-get install -y python-dev  python-numpy  python-py  python-pytest
-# Python 3.6
-sudo apt-get install -y python3-dev python3-numpy python3-py python3-pytest
-
-# GStreamer support
-sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+find / -name " *opencv* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
+find / -name " *opencv4* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
+apt purge libopencv-dev libopencv-python libopencv-samples libopencv* |& tee -a $OUTPUT_FILE 
 
 cd $OPENCV_SOURCE_DIR
-git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv.git
-git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv_contrib.git
+git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv.git |& tee -a $OUTPUT_FILE 
+git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv_contrib.git |& tee -a $OUTPUT_FILE 
 
 if [ $DOWNLOAD_OPENCV_EXTRAS == "YES" ] ; then
  echo "Installing opencv_extras"
  # This is for the test data
  cd $OPENCV_SOURCE_DIR
- git clone https://github.com/opencv/opencv_extra.git
+ git clone https://github.com/opencv/opencv_extra.git |& tee -a $OUTPUT_FILE 
  cd opencv_extra
- git checkout -b v${OPENCV_VERSION} ${OPENCV_VERSION}
+ git checkout -b v${OPENCV_VERSION} ${OPENCV_VERSION} |& tee -a $OUTPUT_FILE 
 fi
 
 cd $OPENCV_SOURCE_DIR/opencvess
-mkdir build
+mkdir build 
 cd build
 
 # Here are some options to install source examples and tests
@@ -165,70 +171,70 @@ time cmake -D CMAKE_BUILD_TYPE=RELEASE \
       -D BUILD_PERF_TESTS=OFF \
       -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
       $"PACKAGE_OPENCV" \
-      ../
+      ../ |& tee -a $OUTPUT_FILE 
 
 
 if [ $? -eq 0 ] ; then
-  echo "CMake configuration make successful"
+  echo "CMake configuration make successful" |& tee -a $OUTPUT_FILE  
 else
   # Try to make again
-  echo "CMake issues " >&2
-  echo "Please check the configuration being used"
+  echo "CMake issues " >&2 |& tee -a $OUTPUT_FILE  
+  echo "Please check the configuration being used" |& tee -a $OUTPUT_FILE 
   exit 1
 fi
 
 # Consider the MAXN performance mode if using a barrel jack on the Nano
-time make -j$NUM_JOBS
+time make -j$NUM_JOBS |& tee -a $OUTPUT_FILE 
 if [ $? -eq 0 ] ; then
-  echo "OpenCV make successful"
+  echo "OpenCV make successful" |& tee -a $OUTPUT_FILE 
 else
   # Try to make again; Sometimes there are issues with the build
   # because of lack of resources or concurrency issues
-  echo "Make did not build " >&2
+  echo "Make did not build " >&2 |& tee -a $OUTPUT_FILE 
   echo "Retrying ... "
   # Single thread this time
-  make
+  make |& tee -a $OUTPUT_FILE 
   if [ $? -eq 0 ] ; then
-    echo "OpenCV make successful"
+    echo "OpenCV make successful" |& tee -a $OUTPUT_FILE 
   else
     # Try to make again
-    echo "Make did not successfully build" >&2
-    echo "Please fix issues and retry build"
+    echo "Make did not successfully build" >&2 |& tee -a $OUTPUT_FILE 
+    echo "Please fix issues and retry build" |& tee -a $OUTPUT_FILE 
     exit 1
   fi
 fi
 
-echo "Installing ... "
-sudo make install
-sudo ldconfig
+echo "Installing ... " |& tee -a $OUTPUT_FILE 
+sudo make install |& tee -a $OUTPUT_FILE 
+sudo ldconfig |& tee -a $OUTPUT_FILE 
 if [ $? -eq 0 ] ; then
-   echo "OpenCV installed in: $CMAKE_INSTALL_PREFIX"
+   echo "OpenCV installed in: $CMAKE_INSTALL_PREFIX" |& tee -a $OUTPUT_FILE 
 else
-   echo "There was an issue with the final installation"
+   echo "There was an issue with the final installation" |& tee -a $OUTPUT_FILE 
    exit 1
 fi
 
 # If PACKAGE_OPENCV is on, pack 'er up and get ready to go!
 # We should still be in the build directory ...
 if [ "$PACKAGE_OPENCV" != "" ] ; then
-   echo "Starting Packaging"
-   sudo ldconfig
-   time sudo make package -j$NUM_JOBS
+   echo "Starting Packaging" |& tee -a $OUTPUT_FILE 
+   sudo ldconfig |& tee -a $OUTPUT_FILE 
+   time sudo make package -j$NUM_JOBS |& tee -a $OUTPUT_FILE
    if [ $? -eq 0 ] ; then
-     echo "OpenCV make package successful"
+     echo "OpenCV make package successful" |& tee -a $OUTPUT_FILE
    else
      # Try to make again; Sometimes there are issues with the build
      # because of lack of resources or concurrency issues
-     echo "Make package did not build " >&2
-     echo "Retrying ... "
+     echo "Make package did not build " >&2 |& tee -a $OUTPUT_FILE
+     echo "Retrying ... " |& tee -a $OUTPUT_FILE
      # Single thread this time
-     sudo make package
+     sudo make package |& tee -a $OUTPUT_FILE
      if [ $? -eq 0 ] ; then
-       echo "OpenCV make package successful"
+       echo "OpenCV make package successful" |& tee -a $OUTPUT_FILE
      else
        # Try to make again
-       echo "Make package did not successfully build" >&2
-       echo "Please fix issues and retry build"
+       echo "Make package did not successfully build" >&2 |& tee -a $OUTPUT_FILE
+       echo "Please fix issues and retry build" |& tee -a $OUTPUT_FILE
        exit 1
      fi
    fi
