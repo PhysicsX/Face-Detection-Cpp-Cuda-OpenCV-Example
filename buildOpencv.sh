@@ -101,7 +101,8 @@ sudo apt-get install -y \
     pkg-config
 
 # Remove old opencv if it is exist
-sudo find / -name " *opencv* " -exec rm -i {} \;
+find / -name " *opencv* " -exec rm -i {} \;
+find / -name " *opencv4* " -exec rm -i {} \;
 
 # Python 2.7
 sudo apt-get install -y python-dev  python-numpy  python-py  python-pytest
@@ -124,7 +125,7 @@ if [ $DOWNLOAD_OPENCV_EXTRAS == "YES" ] ; then
  git checkout -b v${OPENCV_VERSION} ${OPENCV_VERSION}
 fi
 
-cd $OPENCV_SOURCE_DIR/opencv
+cd $OPENCV_SOURCE_DIR/opencvess
 mkdir build
 cd build
 
