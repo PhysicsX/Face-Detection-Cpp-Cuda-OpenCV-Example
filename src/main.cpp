@@ -44,8 +44,6 @@ int main() {
         cerr << "Can not open video source";
         return -1;
     }
-    //cvNamedWindow("FaceDetection", WindowFlags::CV_WINDOW_NORMAL);
-    //cvSetWindowProperty("FaceDetection", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 
     std::vector<cv::Rect> h_found;
     cv::Ptr<cv::cuda::CascadeClassifier> cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
@@ -59,23 +57,18 @@ int main() {
             cerr << "Can not read frame from webcam";
             return -1;
         }
-        //d_frame.upload(frame);
-        //cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
-        //cascade->detectMultiScale(d_gray, d_found);
-	//cascade->convert(d_found, h_found);
 	faceObj.setFrame(frame);
 
-	h_found = faceObj.getRect();
-	for(int i = 0; i < h_found.size(); ++i)
+	for(auto s : faceObj.getRect())
 	{
-              rectangle(frame, h_found[i], Scalar(0,255,255), 5);
+		rectangle(frame, s, Scalar(255,0,0), 3);	
+		std::cout<<s.left<<" "<<s.right<<" "<<s.top<<" "<<s.bottom<<std::endl;
 	}
 
+	cvNamedWindow("FaceDetection", CV_WINDOW_NORMAL);
+	cvSetWindowProperty("FaceDetection", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 
-	cvNamedWindow("Result", CV_WINDOW_NORMAL);
-	cvSetWindowProperty("Result", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-
-        imshow("Result", frame);
+        imshow("FaceDetection", frame);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if (waitKey(1) == 'q') {
             break;

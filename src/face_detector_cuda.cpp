@@ -14,13 +14,9 @@ FaceDetector::FaceDetector()
 	std::thread t([this](){
 	while(1)
 	{	
-		{
-		//std::lock_guard<std::mutex> lk(mMutex);
-    		//mCv.wait(lk, []{return ready;});
 		
 		if(frame.empty() == false)
 		{
-			
 			{
 				std::lock_guard<std::mutex> guard(mMutex);	
 				d_frame.upload(frame);
@@ -34,10 +30,7 @@ FaceDetector::FaceDetector()
 				cascade->convert(d_found, h_found);    	
 			}
 		}
-
-		}
-		//mCV.notify_one();
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	});
    	t.detach();
