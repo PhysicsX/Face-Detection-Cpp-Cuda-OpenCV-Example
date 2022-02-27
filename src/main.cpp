@@ -9,10 +9,6 @@
 #include "face_detector_cuda.hpp"
 #include <thread>
 #include <chrono>
-// g++ -I /usr/local/include/opencv4 example.cpp -o example `pkg-config opencv4 --cflags --libs`
-
-using namespace cv;
-using namespace std;
 
 std::string get_tegra_pipeline(int width, int height, int fps) {
     return "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(width) + ", height=(int)" +
@@ -41,7 +37,7 @@ int main() {
     cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
 
     if (!cap.isOpened()) {
-        cerr << "Can not open video source";
+	std::cout << "Can not open video source";
         return -1;
     }
 
@@ -52,25 +48,25 @@ int main() {
     FaceDetector faceObj;
     while(1)
     {
-	Mat frame;
+	cv::Mat frame;
         if ( !cap.read(frame) ) {
-            cerr << "Can not read frame from webcam";
+	    std::cout << "Can not read frame from webcam";
             return -1;
         }
 	faceObj.setFrame(frame);
 
 	for(auto s : faceObj.getRect())
 	{
-		rectangle(frame, s, Scalar(255,0,0), 3);	
-		std::cout<<s.left<<" "<<s.right<<" "<<s.top<<" "<<s.bottom<<std::endl;
+		cv::rectangle(frame, s, cv::Scalar(0,255,0), 3);	
+		std::cout<<"height "<<s.height<<" width "<<s.width<<" x "<<s.x<<" y "<<s.y<<std::endl;
 	}
 
 	cvNamedWindow("FaceDetection", CV_WINDOW_NORMAL);
 	cvSetWindowProperty("FaceDetection", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 
-        imshow("FaceDetection", frame);
+	imshow("FaceDetection", frame);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        if (waitKey(1) == 'q') {
+        if (cv::waitKey(1) == 'q') {
             break;
         }
     }

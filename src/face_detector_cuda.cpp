@@ -10,11 +10,9 @@
 FaceDetector::FaceDetector()
 {
 	cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
-	
-	std::thread t([this](){
-	while(1)
+	fut = std::async(std::launch::async, [&](){
+	while(flag)
 	{	
-		
 		if(frame.empty() == false)
 		{
 			{
@@ -33,12 +31,15 @@ FaceDetector::FaceDetector()
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	});
-   	t.detach();
-
 }
 
+FaceDetector::~FaceDetector()
+{
+	flag = false;
+	fut.wait();
+}
 
-void FaceDetector::setFrame(Mat matFrame)
+void FaceDetector::setFrame(cv::Mat matFrame)
 {
 	std::lock_guard<std::mutex> guard(mMutex);
 	{

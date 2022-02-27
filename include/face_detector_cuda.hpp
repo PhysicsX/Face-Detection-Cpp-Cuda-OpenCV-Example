@@ -4,23 +4,22 @@
 #include <opencv2/cudaimgproc.hpp>
 #include <vector>
 #include <mutex>
-#include <condition_variable>
-
-using namespace cv;
-using namespace std;
+#include <future>
 
 class FaceDetector
 {
 	cv::Ptr<cv::cuda::CascadeClassifier> cascade;
 	cv::cuda::GpuMat d_frame, d_gray, d_found;
-	Mat frame;
+	cv::Mat frame;
 	std::vector<cv::Rect> h_found;
-	std::mutex mMutex, mMutex2;
-	bool mReady = false;
-	std::condition_variable mCv;
+	std::mutex mMutex;
+	bool flag = true;
+	std::future<void> fut;
+
 	public:
 
 	FaceDetector();
-	void setFrame(Mat frame);
+	~FaceDetector();
+	void setFrame(cv::Mat frame);
 	std::vector<cv::Rect> getRect();
 };
