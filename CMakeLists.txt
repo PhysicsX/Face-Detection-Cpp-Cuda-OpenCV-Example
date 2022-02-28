@@ -25,7 +25,7 @@ target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Model file
-set(HAARCASCADE_FRONTAL "${PROJECT_SOURCE_DIR}/model/haarcascade_frontalface_default.xml")
+set(HAARCASCADE_FRONTAL "${PROJECT_SOURCE_DIR}/model/haarcascade_frontalface_alt.xml")
 #set(FACE_DETECTION_WEIGHTS "${PROJECT_SOURCE_DIR}/assets/res10_300x300_ssd_iter_140000_fp16.caffemodel")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE HAARCASCADE_FRONTAL="${HAARCASCADE_FRONTAL}")
