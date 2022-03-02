@@ -9,6 +9,7 @@
 #include "face_detector_cuda.hpp"
 #include <thread>
 #include <chrono>
+#include <csignal>
 
 std::string get_tegra_pipeline(int width, int height, int fps) {
     return "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(width) + ", height=(int)" +
@@ -16,9 +17,18 @@ std::string get_tegra_pipeline(int width, int height, int fps) {
            "/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
 }
 
+bool runFlag = true;
+
+void interrupt(int sign)
+{
+	runFlag = false;
+}
+
 int main() {
 
-
+    // to kill from ssh
+    std::signal(SIGINT, interrupt);
+  
     std::cout << "OpenCV version : " << CV_VERSION << std::endl;
     std::cout << "Major version : " << CV_MAJOR_VERSION << std::endl;
     std::cout << "Minor version : " << CV_MINOR_VERSION << std::endl;
@@ -46,7 +56,7 @@ int main() {
     cv::cuda::GpuMat d_frame, d_gray, d_found;
 
     FaceDetector faceObj;
-    while(1)
+    while(true)
     {
 	cv::Mat frame;
         if ( !cap.read(frame) ) {
@@ -66,7 +76,7 @@ int main() {
 
 	imshow("FaceDetection", frame);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        if (cv::waitKey(1) == 'q') {
+        if (cv::waitKey(1) == 'q' || runFlag == false) {
             break;
         }
     }
