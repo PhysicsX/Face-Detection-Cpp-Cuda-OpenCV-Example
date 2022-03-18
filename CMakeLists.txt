@@ -3,7 +3,7 @@ project(FaceDetectorCudaOpenCV LANGUAGES CXX)
 
 include_directories(include)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/face_detector_cuda.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/face_detector_cuda.cpp src/streamer.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
