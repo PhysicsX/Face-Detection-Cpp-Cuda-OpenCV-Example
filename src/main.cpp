@@ -27,7 +27,7 @@ void interrupt(int sign)
 int main() {
 
     // to kill from ssh
-    std::signal(SIGINT, interrupt);
+    //std::signal(SIGINT, interrupt);
   
     std::cout << "OpenCV version : " << CV_VERSION << std::endl;
     std::cout << "Major version : " << CV_MAJOR_VERSION << std::endl;
@@ -35,28 +35,30 @@ int main() {
     std::cout << "Subminor version : " << CV_SUBMINOR_VERSION << std::endl;
     
 	// Options
-    int WIDTH = 800;
-    int HEIGHT = 480;
-    int FPS = 30;
+    //int WIDTH = 800;
+   // int HEIGHT = 480;
+   // int FPS = 30;
 
     // Define the gstream pipeline
-    std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
-    std::cout << "Using pipeline: \n\t" << pipeline << "\n";
+    //std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
+    //std::cout << "Using pipeline: \n\t" << pipeline << "\n";
 
     // Create OpenCV capture object, ensure it works.
-    cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
+    //cv::VideoCapture cap(pipeline, cv::CAP_GSTREAMER);
 
-    if (!cap.isOpened()) {
-	std::cout << "Can not open video source";
-        return -1;
-    }
+    //if (!cap.isOpened()) {
+    //	std::cout << "Can not open video source";
+    //    return -1;
+    //}
 
-    std::vector<cv::Rect> h_found;
-    cv::Ptr<cv::cuda::CascadeClassifier> cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
-    cv::cuda::GpuMat d_frame, d_gray, d_found;
+    //std::vector<cv::Rect> h_found;
+    //cv::Ptr<cv::cuda::CascadeClassifier> cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
+    //cv::cuda::GpuMat d_frame, d_gray, d_found;
 
     FaceDetector faceObj;
-    while(true)
+    faceObj.loop();
+    
+    /*  while(true)
     {
 	cv::Mat frame;
         if ( !cap.read(frame) ) {
@@ -80,6 +82,6 @@ int main() {
             break;
         }
     }
-
+*/
     return 0;
 }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <future>
+#include "streamer.hpp"
 
 class FaceDetector
 {
@@ -14,12 +15,16 @@ class FaceDetector
 	std::vector<cv::Rect> h_found;
 	std::mutex mMutex;
 	bool flag = true;
+	static bool runFlag;
 	std::future<void> fut;
-
+        //Streamer mStreamer(int width = 800, int height = 480, int fps = 30);
+	Streamer* mStreamer;
 	public:
 
 	FaceDetector();
 	~FaceDetector();
 	void setFrame(cv::Mat frame);
 	std::vector<cv::Rect> getRect();
+	static void interrupt(int);
+	void loop();
 };
