@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <future>
+#include <memory>
 #include "streamer.hpp"
 
 class FaceDetector
@@ -18,7 +19,8 @@ class FaceDetector
 	static bool runFlag;
 	std::future<void> fut;
         //Streamer mStreamer(int width = 800, int height = 480, int fps = 30);
-	Streamer* mStreamer;
+	//Streamer* mStreamer;
+	std::unique_ptr<Streamer> mStreamer;
 	public:
 
 	FaceDetector();

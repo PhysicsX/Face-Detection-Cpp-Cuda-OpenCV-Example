@@ -12,10 +12,10 @@
 
 bool FaceDetector::runFlag = true;
 
-FaceDetector::FaceDetector()
+FaceDetector::FaceDetector():mStreamer(std::make_unique<Streamer>(800, 480, 30))
 {
 	std::signal(SIGINT, interrupt);
-	mStreamer = new Streamer(800, 480, 30);
+	//mStreamer = new Streamer(800, 480, 30);
 	cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
 	fut = std::async(std::launch::async, [&](){
 	while(flag)
@@ -44,7 +44,7 @@ FaceDetector::~FaceDetector()
 {
 	flag = false;
 	fut.wait();
-	delete mStreamer;
+	//delete mStreamer;
 }
 
 void FaceDetector::interrupt(int sign)
