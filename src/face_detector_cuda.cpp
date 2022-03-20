@@ -1,50 +1,39 @@
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <opencv2/cudaobjdetect.hpp>
-#include <opencv2/cudaimgproc.hpp>
 #include "face_detector_cuda.hpp"
-#include <thread>
-#include <chrono>         // std::chrono::seconds
-#include <mutex>
-#include <thread>
-#include <chrono>
-#include <csignal>
 
 bool FaceDetector::runFlag = true;
 
-FaceDetector::FaceDetector():mStreamer(std::make_unique<Streamer>(800, 480, 30))
+FaceDetector::FaceDetector():mStreamer(Streamer(800, 480, 30))
 {
 	std::signal(SIGINT, interrupt);
-	//mStreamer = new Streamer(800, 480, 30);
 	cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
+	
 	fut = std::async(std::launch::async, [&](){
-	while(flag)
-	{	
-		if(frame.empty() == false)
-		{
+		while(runFlag)
+		{	
+			if(frame.empty() == false)
 			{
-				std::lock_guard<std::mutex> guard(mMutex);	
-				d_frame.upload(frame);
-			}
+			cv::cuda::GpuMat d_frame, d_gray, d_found;
+				{
+					std::lock_guard<std::mutex> guard(mMutex);	
+					d_frame.upload(frame);
+				}
 
-			cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
-			cascade->detectMultiScale(d_gray, d_found);
+				cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
+				cascade->detectMultiScale(d_gray, d_found);
 			
-			{
-				std::lock_guard<std::mutex> guard(mMutex);
-				cascade->convert(d_found, h_found);    	
+				{
+					std::lock_guard<std::mutex> guard(mMutex);
+					cascade->convert(d_found, h_found);    	
+				}
 			}
-		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+		}
 	});
 }
 
 FaceDetector::~FaceDetector()
 {
-	flag = false;
 	fut.wait();
-	//delete mStreamer;
 }
 
 void FaceDetector::interrupt(int sign)
@@ -55,12 +44,10 @@ void FaceDetector::interrupt(int sign)
 void FaceDetector::setFrame(cv::Mat matFrame)
 {
 	std::lock_guard<std::mutex> guard(mMutex);
-	{
-		frame=matFrame;
-	}
+	frame=matFrame;
 }
 
-std::vector<cv::Rect> FaceDetector::getRect()
+std::vector<cv::Rect> FaceDetector::getRect() const
 {
 	std::lock_guard<std::mutex> guard(mMutex);	
 	return h_found;
@@ -68,17 +55,20 @@ std::vector<cv::Rect> FaceDetector::getRect()
 
 void FaceDetector::loop()
 {
-	while(true){
+	while(runFlag){
 	cv::Mat frame;
 	
-	mStreamer->returnFrame(frame);
+	mStreamer.returnFrame(frame);
 	
 	setFrame(frame);
 
-	for(auto s : getRect())
+	//for(auto s : getRect())
+	
+	for(int i{0}; i < getRect().size(); i++)
 	{
-		cv::rectangle(frame, s, cv::Scalar(0,255,0), 3);	
-		std::cout<<"height "<<s.height<<" width "<<s.width<<" x "<<s.x<<" y "<<s.y<<std::endl;
+		cv::rectangle(frame, getRect()[i], cv::Scalar(0,255,0), 3);	
+		//std::cout<<"height "<<s.height<<" width "<<s.width<<" x "<<s.x<<" y "<<s.y<<std::endl;
+		std::cout<<i<<" height "<<getRect()[i].height<<" width "<<getRect()[i].width<<" x "<<getRect()[i].x<<" y "<<getRect()[i].y<<std::endl;
 	}
 
 	cvNamedWindow("FaceDetection", CV_WINDOW_NORMAL);
@@ -86,8 +76,9 @@ void FaceDetector::loop()
 
 	imshow("FaceDetection", frame);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        if (cv::waitKey(1) == 'q' || runFlag == false) {
-            break;
+        if (cv::waitKey(1) == 'q') {
+            	runFlag = false;
+		break;
         }
 	}
 }

@@ -6,27 +6,28 @@
 #include <mutex>
 #include <future>
 #include <memory>
+#include <thread>
+#include <chrono>
+#include <csignal>
 #include "streamer.hpp"
 
 class FaceDetector
 {
 	cv::Ptr<cv::cuda::CascadeClassifier> cascade;
-	cv::cuda::GpuMat d_frame, d_gray, d_found;
-	cv::Mat frame;
 	std::vector<cv::Rect> h_found;
-	std::mutex mMutex;
-	bool flag = true;
+	cv::Mat frame;
+	mutable std::mutex mMutex;
 	static bool runFlag;
 	std::future<void> fut;
-        //Streamer mStreamer(int width = 800, int height = 480, int fps = 30);
-	//Streamer* mStreamer;
-	std::unique_ptr<Streamer> mStreamer;
+	Streamer mStreamer;
+
+	void setFrame(cv::Mat frame);
+	static void interrupt(int);
+	
 	public:
 
 	FaceDetector();
 	~FaceDetector();
-	void setFrame(cv::Mat frame);
-	std::vector<cv::Rect> getRect();
-	static void interrupt(int);
+	std::vector<cv::Rect> getRect() const;
 	void loop();
 };
