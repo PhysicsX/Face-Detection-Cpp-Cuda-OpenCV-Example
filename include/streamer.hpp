@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STREAMER_H
+#define STREAMER_H
 
 #include <string>
 #include <iostream>
@@ -26,3 +27,4 @@ class Streamer
 		cv::VideoCapture cap;
 };
 
+#endif
