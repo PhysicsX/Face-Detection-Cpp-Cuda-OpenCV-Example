@@ -2,7 +2,7 @@
 
 bool FaceDetector::runFlag = true;
 
-FaceDetector::FaceDetector():mStreamer(Streamer(800, 480, 30))
+FaceDetector::FaceDetector():mStreamer(Streamer(0, 800, 480, 30))
 {
 	std::signal(SIGINT, interrupt);
 	cascade = cv::cuda::CascadeClassifier::create(HAARCASCADE_FRONTAL);
@@ -41,7 +41,7 @@ void FaceDetector::interrupt(int sign)
 	runFlag = false;
 }
 
-void FaceDetector::setFrame(cv::Mat matFrame)
+void FaceDetector::setFrame(cv::Mat& matFrame)
 {
 	std::lock_guard<std::mutex> guard(mMutex);
 	frame=matFrame;
@@ -62,12 +62,9 @@ void FaceDetector::loop()
 	
 	setFrame(frame);
 
-	//for(auto s : getRect())
-	
 	for(int i{0}; i < getRect().size(); i++)
 	{
 		cv::rectangle(frame, getRect()[i], cv::Scalar(0,255,0), 3);	
-		//std::cout<<"height "<<s.height<<" width "<<s.width<<" x "<<s.x<<" y "<<s.y<<std::endl;
 		std::cout<<i<<" height "<<getRect()[i].height<<" width "<<getRect()[i].width<<" x "<<getRect()[i].x<<" y "<<getRect()[i].y<<std::endl;
 	}
 
