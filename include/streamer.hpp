@@ -15,7 +15,7 @@ class Streamer
 {
 	public:
 		
-		Streamer(int, int, int);
+		Streamer(int, int, int, int);
 		
 
 		void returnFrame(cv::Mat&);

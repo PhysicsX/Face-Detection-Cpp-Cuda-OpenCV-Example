@@ -21,7 +21,7 @@ class FaceDetector
 	std::future<void> fut;
 	Streamer mStreamer;
 
-	void setFrame(cv::Mat frame);
+	void setFrame(cv::Mat& frame);
 	static void interrupt(int);
 	
 	public:
