@@ -1,3 +1,6 @@
+#ifndef FACE_DETECTOR_H
+#define FACE_DETECTOR_H
+
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/cudaobjdetect.hpp>
@@ -31,3 +34,5 @@ class FaceDetector
 	std::vector<cv::Rect> getRect() const;
 	void loop();
 };
+
+#endif // FACE_DETECTOR_H

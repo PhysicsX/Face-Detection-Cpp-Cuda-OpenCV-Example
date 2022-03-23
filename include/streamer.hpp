@@ -13,18 +13,15 @@
 
 class Streamer
 {
+
+		std::string pipeline;
+		int width, height, fps;
+		cv::VideoCapture cap;
+
 	public:
 		
 		Streamer(int, int, int, int);
-		
-
 		void returnFrame(cv::Mat&);
-
-		std::string pipeline;
-		int width;
-		int height;
-		int fps;
-		cv::VideoCapture cap;
 };
 
 #endif
