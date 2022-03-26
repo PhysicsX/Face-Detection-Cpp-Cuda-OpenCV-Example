@@ -1,24 +1,22 @@
 #!/bin/bash
+
 OPENCV_VERSION=4.4.0
 
-# Jetson Nano
 ARCH_BIN=5.3
-
-OUTPUT_FILE=output.txt
+WHEREAMI=$PWD
+OUTPUT_FILE=$WHEREAMI/output.txt
 
 if [ -f "$OUTPUT_FILE" ]; then
     echo "$OUTPUT_FILE exists deleting it"
     rm -rf $OUTPUT_FILE
 fi
 
-# Source code directory
 OPENCV_SOURCE_DIR=$HOME
-WHEREAMI=$PWD
+
 INSTALL_DIR=/usr/local
 
 CMAKE_INSTALL_PREFIX=$INSTALL_DIR
 
-# Print out the current configuration
 echo " Path for installation $CMAKE_INSTALL_PREFIX"
 echo " Path for source $OPENCV_SOURCE_DIR"
 
@@ -61,15 +59,15 @@ sudo apt-get install -y \
     pkg-config |& tee -a $OUTPUT_FILE 
 
 # Remove old opencv if it is exist
-find / -name " *opencv* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
-find / -name " *opencv4* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
-apt purge libopencv-dev libopencv-python libopencv-samples libopencv* |& tee -a $OUTPUT_FILE 
+sudo find / -name " *opencv* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
+sudo find / -name " *opencv4* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
+sudo apt purge libopencv-dev libopencv-python libopencv-samples libopencv* |& tee -a $OUTPUT_FILE 
 
 cd $OPENCV_SOURCE_DIR
 git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv.git |& tee -a $OUTPUT_FILE 
 git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv_contrib.git |& tee -a $OUTPUT_FILE 
 
-cd $OPENCV_SOURCE_DIR/opencvess
+cd $OPENCV_SOURCE_DIR/opencv
 mkdir build 
 cd build
 
@@ -106,7 +104,6 @@ else
   exit 1
 fi
 
-# Consider the MAXN performance mode if using a barrel jack on the Nano
 time make -j1 |& tee -a $OUTPUT_FILE 
 if [ $? -eq 0 ] ; then
   echo "OpenCV make successful" |& tee -a $OUTPUT_FILE 
@@ -125,10 +122,7 @@ else
    exit 1
 fi
 
-# If PACKAGE_OPENCV is on, pack 'er up and get ready to go!
-# We should still be in the build directory ...
-
-echo "Starting Packaging" |& tee -a $OUTPUT_FILE 
+echo "Crate deb package for opencv" |& tee -a $OUTPUT_FILE 
 sudo ldconfig |& tee -a $OUTPUT_FILE 
 time sudo make package -j1 |& tee -a $OUTPUT_FILE
 if [ $? -eq 0 ] ; then
@@ -137,3 +131,6 @@ else
   echo "Make package did not successfully build" |& tee -a $OUTPUT_FILE
   exit 1
 fi
+
+echo "OpenCV successfully built and installed. Enjoy !"
+
