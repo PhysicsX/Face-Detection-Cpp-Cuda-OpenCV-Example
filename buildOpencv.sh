@@ -61,7 +61,7 @@ sudo apt-get install -y \
 # Remove old opencv if it is exist
 sudo find / -name " *opencv* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
 sudo find / -name " *opencv4* " -exec rm -i {} \; |& tee -a $OUTPUT_FILE 
-sudo apt purge libopencv-dev libopencv-python libopencv-samples libopencv* |& tee -a $OUTPUT_FILE 
+sudo apt purge -y libopencv-dev libopencv-python libopencv-samples libopencv* |& tee -a $OUTPUT_FILE 
 
 cd $OPENCV_SOURCE_DIR
 git clone --branch "$OPENCV_VERSION" https://github.com/opencv/opencv.git |& tee -a $OUTPUT_FILE 
@@ -132,5 +132,5 @@ else
   exit 1
 fi
 
-echo "OpenCV successfully built and installed. Enjoy !"
+echo "OpenCV successfully built and installed. Enjoy !" |& tee -a $OUTPUT_FILE
 
