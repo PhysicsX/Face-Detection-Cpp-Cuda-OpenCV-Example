@@ -1,16 +1,19 @@
-# Face Detection Example with Cuda and OPenCV
+# Face Detection Example with Cuda and OpenCV using C++
 
-Example of face detection using haarcascade model using cuda on Jetson Nano/NX development board.
+Example of face detection using haarcascade model using cuda on Jetson Nano/NX development board. 
+What is Cuda ? Cuda is framework to use GPU for massive calculations like image processing or AI applications etc. If you want efficient, robust and industrial Object/Face Detection application especially for embedded devices, C++ and Cuda is a good option.
+
+![](https://github.com/PhysicsX/Face-Detection-Cuda-OpenCV-Example/blob/master/misc/faceDetection.gif?raw=true)
 
 ## OpenCV installation
-Just run the script on the ubuntu. (JetPack 4.6.1)
+Latest version of the OpenCV is needed. Just run the script on the ubuntu. (tested with JetPack 4.6.0 and opencv version is 4.4.0)
 ```bash
 ./buildOpencv.sh
 ```
-This script will delete current opencv installation and pull the desired version from the repo and compile it using cuda extension.
-Qt4 is disabled. You can build the qt5 yourself.
+This script will delete current OpenCV installation and pull the desired version from the repo and compile it using cuda extension.
+Qt4 is disabled. You can build the Qt5 yourself.
 You can find the configuration summary like this: 
-As it is seen, cuda should be "YES" ( NVIDIA CUDA: YES (ver 10.2, CUFFT CUBLAS FAST_MATH)). All build log will be saved to a file. You can read it later for debugging purpose.
+As it is seen, cuda should be "YES" ( NVIDIA CUDA: YES (ver 10.2, CUFFT CUBLAS FAST_MATH)). 
 
 ```bash
 -- General configuration for OpenCV 4.4.0 =====================================
@@ -133,14 +136,18 @@ As it is seen, cuda should be "YES" ( NVIDIA CUDA: YES (ver 10.2, CUFFT CUBLAS F
 -- -----------------------------------------------------------------
 
 ```
-
+All build log will be saved to a file. You can read it later for debugging purpose. It will be on the same directory.
+Note: I do not run the script as "su" so it can ask password and because of timeout it can ask again during the installation. Yes installetion will take a few hours on the jetson Nano :(. And also there can be console prompt questions. That is why time to time check that what script needs help or not.
 
 ## How to test the application
-Now you are ready to run the app.  Be sure that picamera is connected to correct port. There are two. Or you can adjust from the accroding to sensor id.
+Now you are ready to run the app.  Be sure that picamera is connected to correct port. There are two. Or you can adjust from the accroding to sensor id from code.
+
+![](https://www.uctronics.com/media/catalog/product/cache/5d1f08909b337dbf64263212361f58e9/i/m/imx219_ff_ir_nano_4.jpg)
+
 If you are working from ssh or remotely then do not forget to export display after or before building the binary.
-Go to file directory.
+If you are not go to base directory where CMakeList.txt is located and run:
 ```
 $ mkdir build && cd build && cmake .. && cmake --build
 $ export DISPLAY=:0
-$ ./FaceDetectorCudaOpenCV
+$ ./build/FaceDetectorCudaOpenCV
 ```
