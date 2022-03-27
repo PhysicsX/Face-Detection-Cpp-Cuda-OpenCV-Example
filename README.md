@@ -144,10 +144,10 @@ Now you are ready to run the app.  Be sure that picamera is connected to correct
 
 ![](https://www.uctronics.com/media/catalog/product/cache/5d1f08909b337dbf64263212361f58e9/i/m/imx219_ff_ir_nano_4.jpg)
 
-If you are working from ssh or remotely then do not forget to export display after or before building the binary.
-If you are not go to base directory where CMakeList.txt is located and run:
+If you are working from ssh or remotely then do not forget to export display before running the binary.
+Then go to the base directory (If you are not there) where CMakeList.txt is located and run:
 ```
-$ mkdir build && cd build && cmake .. && cmake --build
+$ mkdir build && cd build && cmake .. && cmake --build .
 $ export DISPLAY=:0
 $ ./build/FaceDetectorCudaOpenCV
 ```
