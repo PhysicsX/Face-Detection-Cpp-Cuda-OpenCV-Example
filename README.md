@@ -5,6 +5,9 @@ What is Cuda ? Cuda is framework to use GPU for massive calculations like image 
 
 ![](https://github.com/PhysicsX/Face-Detection-Cuda-OpenCV-Example/blob/master/misc/faceDetection.gif?raw=true)
 
+## Models
+Model should be suitable for cuda interface. You can test these model with the example  just change the variable in the cmake. But the models are old. I am looking that how we can use the new ones or sth else? https://github.com/opencv/opencv/tree/master/data/haarcascades_cuda
+
 ## OpenCV installation
 Latest version of the OpenCV is needed. Just run the script on the ubuntu. (tested with JetPack 4.6.0 and opencv version is 4.4.0)
 ```bash
